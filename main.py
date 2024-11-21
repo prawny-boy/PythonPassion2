@@ -21,7 +21,9 @@ _pygame.display.set_caption("Tail of the Dragon")
 _pygame.display.set_icon(_pygame.image.load("Sprites\\Icon.png"))
 
 _pygame.font.init()
-inktype_font = _pygame.font.Font("Fonts\\InkType.ttf", 20)
+# inktype_font = _pygame.font.Font("Fonts\\InkType.ttf", 20)
+# mochalatte_font = _pygame.font.Font("Fonts\\Mochalatte.ttf", 20)
+inktype_font = _pygame.font.Font(None, 20)
 mochalatte_font = _pygame.font.Font("Fonts\\Mochalatte.ttf", 20)
 
 menu_background_rgb = (30, 36, 54)
@@ -106,28 +108,31 @@ def manage_interactives():
     
     return buttons_dict
 
-def check_buttons(game_state, user, toggle, textbox_text):
+def check_buttons(game_state):
     if button_dict["start button"].check_click():
         game_state = "Game"
     elif button_dict["challenges button"].check_click():
         game_state = "Challenges"
-    return game_state, user, toggle
+    return game_state
 
 menu = True
 while True:
     if menu:
         # Menu Loop
         while True:
+            clock.tick(60)
+            # button_dict:dict[str, Button] = manage_interactives()
             for event in _pygame.event.get():
                 if event.type == _pygame.QUIT:
                     _pygame.quit()
                     exit("User quit the game.")
                 if event.type == _pygame.MOUSEBUTTONDOWN:
                     if new_press:
-                        game_state, user, toggle = check_buttons(game_state, user, toggle, textbox_text)
+                        game_state = check_buttons(game_state)
                     new_press = False
                 else:
                     new_press = True
+            _pygame.display.flip()
     else:
         # Main Game Loop
         while True:
