@@ -24,18 +24,16 @@ _pygame.font.init()
 # inktype_font = _pygame.font.Font("Fonts\\InkType.ttf", 20)
 # mochalatte_font = _pygame.font.Font("Fonts\\Mochalatte.ttf", 20)
 inktype_font = _pygame.font.Font(None, 20)
-mochalatte_font = _pygame.font.Font("Fonts\\Mochalatte.ttf", 20)
+mochalatte_font = _pygame.font.Font(None, 36)
 
 menu_background_rgb = (30, 36, 54)
 colour_black = (0, 0, 0)
 colour_white = (255, 255, 255)
 
-screen.fill(menu_background_rgb)
-_pygame.display.update()
-
 # Variables
 game_state = "Menu"
 button_dict = {}
+score = 0
 
 # Classes
 class Button:
@@ -96,8 +94,9 @@ class Button:
 # Functions
 def manage_interactives():
     buttons_dict = {}
-    buttons = [("start button", ("Start", 15, 100, 300, 50), "Menu"), 
-               ("challenges button", ("Challenges", 15, 100, 300, 50), "Menu")]
+    buttons = [("start", ("Start", 100, 250, 200, 50), "Menu"), 
+               ("challenges", ("Challenges", 100, 350, 200, 50), "Menu"),
+               ("challenges back", ("Back", 100, 450, 200, 50), "Challenges")]
     for i in range(len(buttons)):
         button = buttons[i]
         if button[2] == game_state:
@@ -109,19 +108,52 @@ def manage_interactives():
     return buttons_dict
 
 def check_buttons(game_state):
-    if button_dict["start button"].check_click():
+    if button_dict["start"].check_click():
         game_state = "Game"
-    elif button_dict["challenges button"].check_click():
+    elif button_dict["challenges"].check_click():
         game_state = "Challenges"
+    elif button_dict["challenges back"].check_click():
+        game_state = "Menu"
     return game_state
+
+def draw_page(game_state, score):
+    if game_state == "Menu":
+        screen.fill(menu_background_rgb)
+        draw_text("Tail of the Dragon", 15, 50, colour=colour_white, font=mochalatte_font)
+    elif game_state == "Challenges":
+        draw_text("Challenges: Not done yet", 15, 50, colour=colour_white, font=mochalatte_font)
+    elif game_state == "Game":
+        draw_text(f"Score: {score}", 15, 15, colour=colour_white, font=mochalatte_font)
+
+def draw_text(text:str, x, y, colour=colour_white, font=inktype_font, line_spacing=15):
+    # Split text into lines at newline characters
+    lines = text.split('\n')
+    for i, line in enumerate(lines):
+        line_surface = font.render(line, True, colour)
+        line_rect = line_surface.get_rect(topleft=(x, y + i * line_spacing))
+        screen.blit(line_surface, line_rect)
 
 menu = True
 while True:
-    if menu:
+    if game_state == "Game":
+        # Main Game Loop
+        while True:
+            screen.fill(menu_background_rgb)
+            draw_page(game_state, score)
+            clock.tick(60)
+            for event in _pygame.event.get():
+                if event.type == _pygame.QUIT:
+                    _pygame.quit()
+                    exit("User quit the game.")
+                if event.type == _pygame.KEYDOWN:
+                    pass
+    else:
         # Menu Loop
         while True:
+            screen.fill(menu_background_rgb)
+            draw_page(game_state, score)
             clock.tick(60)
-            # button_dict:dict[str, Button] = manage_interactives()
+            button_dict:dict[str, Button] = manage_interactives()
             for event in _pygame.event.get():
                 if event.type == _pygame.QUIT:
                     _pygame.quit()
@@ -133,12 +165,3 @@ while True:
                 else:
                     new_press = True
             _pygame.display.flip()
-    else:
-        # Main Game Loop
-        while True:
-            for event in _pygame.event.get():
-                if event.type == _pygame.QUIT:
-                    _pygame.quit()
-                    exit("User quit the game.")
-                if event.type == _pygame.KEYDOWN:
-                    pass
